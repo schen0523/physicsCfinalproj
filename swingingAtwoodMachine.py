@@ -3,6 +3,7 @@ Web VPython 3.2
 running = False
 speed_multiplier = 1
 trail = False
+labels = True
 g = 9.81
 m1 = 1.0       # swinging mass
 m2 = 1.0       # non swinging mass
@@ -12,8 +13,8 @@ l1 = 5.0       # r (distance from pulley to swinging mass)
 l2 = 5.0       
 L = 10.0       # total rope length
 rd = 0.0       # r dot (radial velocity)
-theta = 0.0    # theta (angle)
-omega = 0.0    # theta dot (angular velocity)
+theta = 0.0    # theta
+omega = 0.0 
 dt = 0.001
 
 def start(button):
@@ -32,6 +33,8 @@ def reset(button):
     theta = angleslider.value
     rd = 0.0
     omega = 0.0
+    gPhase.delete()
+    rPhase.delete()
     
     if trail:
         mass1.clear_trail()
@@ -55,21 +58,37 @@ def toggle_trail(button):
     else:
         button.text = "   Enable Trail   "
         mass1.clear_trail()
+        
+def toggle_label(button):
+    global labels
+    labels = not labels
+    
+    if labels:
+        button.text = "   Disable Labels  "
+    else:
+        button.text = "   Enable Labels   "
+        
+    mass1label.visible = labels
+    mass2label.visible = labels
+    pmass1label.visible = labels
+    pmass2label.visible = labels
+    pradius1label.visible = labels
+    pradius2label.visible = labels
 
 def preset1(button):
     mass1slider.value = 1.0; updatemass1(mass1slider)
     mass2slider.value = 1.555; updatemass2(mass2slider)
-    string1slider.value = 4.0; updatestring1(string1slider)
-    string2slider.value = 2.0; updatestring2(string2slider)
-    angleslider.value = pi/4; updateangle(angleslider)
+    string1slider.value = 5.0; updatestring1(string1slider)
+    string2slider.value = 5.0; updatestring2(string2slider)
+    angleslider.value = pi/2; updateangle(angleslider)
     reset(None)
 
 def preset2(button):
     mass1slider.value = 1; updatemass1(mass1slider)
     mass2slider.value = 6; updatemass2(mass2slider)
-    string1slider.value = 2.0; updatestring1(string1slider)
-    string2slider.value = 4.0; updatestring2(string2slider)
-    angleslider.value = pi/3; updateangle(angleslider)
+    string1slider.value = 5.0; updatestring1(string1slider)
+    string2slider.value = 5.0; updatestring2(string2slider)
+    angleslider.value = pi/2; updateangle(angleslider)
     reset(None)
 
 def preset3(button):
@@ -77,19 +96,25 @@ def preset3(button):
     mass2slider.value = 1.665; updatemass2(mass2slider)
     string1slider.value = 5.0; updatestring1(string1slider)
     string2slider.value = 5.0; updatestring2(string2slider)
-    angleslider.value = pi/6; updateangle(angleslider)
+    angleslider.value = pi/2; updateangle(angleslider)
     reset(None)
 
 def updatemass1(slider):
     global m1
     m1 = slider.value
-    mass1label.text = f"{m1:.4f} kg"
+    
+    if labels:
+        mass1label.text = f"{m1:.4f} kg"
+        
     mass1.radius = pow(m1, 1/3) * 0.5
 
 def updatemass2(slider):
     global m2
     m2 = slider.value
-    mass2label.text = f"{m2:.4f} kg"
+    
+    if labels:
+        mass2label.text = f"{m2:.4f} kg"
+        
     mass2.radius = pow(m2, 1/3) * 0.5
 
 def updatestring1(slider):
@@ -114,14 +139,19 @@ def updateangle(slider):
 def updatepmass(slider):
     global mpivot
     mpivot = slider.value
-    pmass1label.text = f"{mpivot:.3f} kg"
-    pmass2label.text = f"{mpivot:.3f} kg"
+    
+    if labels:
+        pmass1label.text = f"{mpivot:.3f} kg"
+        pmass2label.text = f"{mpivot:.3f} kg"
 
 def updatepradius(slider):
     global rpivot
     rpivot = slider.value
-    pradius1label.text = f"{rpivot:.3f} cm "
-    pradius2label.text = f"{rpivot:.3f} cm "
+    
+    if labels:
+        pradius1label.text = f"{rpivot:.3f} cm "
+        pradius2label.text = f"{rpivot:.3f} cm "
+        
     pivot1.radius = max(0.3, rpivot / 10.0)
     pivot2.radius = max(0.3, rpivot / 10.0)
 
@@ -131,7 +161,8 @@ startButton = button(bind=start, text="    Start      ", background=vec(0.7, 0.9
 pauseButton = button(bind=pause, text="        Pause        ", background=vec(0.7, 0.9, 0.95))
 resetButton = button(bind=reset, text="        Reset        ", background=vec(0.7, 0.9, 0.95))
 speedButton = button(bind=speed_up, text="      Speed Up       ", background=vec(0.7, 0.9, 0.95))
-enableButton = button(bind=toggle_trail, text="      Enable Trail     ", background=vec(0.7, 0.9, 0.95))
+trailButton = button(bind=toggle_trail, text="      Enable Trail     ", background=vec(0.7, 0.9, 0.95))
+labelButton = button(bind=toggle_label, text="      Disable Labels     ", background=vec(0.7, 0.9, 0.95))
 scene.append_to_caption("\n\n")
 scene.append_to_caption("\t")
 preset1Button = button(bind=preset1, text="      Preset 1       ", background=vec(0.7, 0.9, 0.95))
@@ -192,7 +223,8 @@ pivot1 = sphere(pos=vector(-5, 5, 0), radius=0.3, color=color.white)
 pivot2 = sphere(pos=vector(7, 5, 0), radius=0.3, color=color.white)
 bridge_string = curve(pos=[pivot2.pos, pivot1.pos], color=vec(0.7, 0.9, 0.95))
 
-mass1 = sphere(pos=vector(-5, 0, 0), color=color.blue, radius=0.5, make_trail=False, trail_type="points", interval=100)
+mass1 = sphere(pos=vector(-5, 0, 0), color=color.blue, radius=0.5, make_trail=False)
+#mass1 = sphere(pos=vector(-5, 0, 0), color=color.blue, radius=0.5, make_trail=False, trail_type="points", interval=25, retain = 500)
 mass1label = label(pos=mass1.pos, text="1.0 kg", box=False)
 
 mass2 = sphere(pos=vector(7, 0, 0), color=color.red, radius=0.5, make_trail=False)
@@ -207,10 +239,17 @@ pmass2label = label(pos=pivot2.pos, text="0.0 kg", yoffset=15, box=False)
 pradius1label = label(pos=pivot1.pos, text="0.0 cm", xoffset=30, yoffset=15, box=False)
 pradius2label = label(pos=pivot2.pos, text="0.0 cm", xoffset=30, yoffset=15, box=False)
 
+gPhasePlot = graph(title="Angular Phase Space", xtitle="theta (rad)", ytitle="omega(rad/s)")
+gPhase = gcurve(color=color.blue) 
+
+rPhasePlot = graph(title="Radial Phase Space", xtitle="r (cm)", ytitle="rdot (cm/s)")
+rPhase = gcurve(color=color.red) 
+
+
 def update_visuals():
     bottom1 = pivot1.pos + vector(l1 * sin(-theta), -l1 * cos(-theta), 0)
     mass1.pos = bottom1
-    mass1label.pos = mass1.pos
+
     
     string1.clear()
     string1.append(pos=pivot1.pos)
@@ -218,11 +257,15 @@ def update_visuals():
     
     bottom2 = pivot2.pos + vector(0, -(L - l1), 0)
     mass2.pos = bottom2
-    mass2label.pos = mass2.pos
+    
     
     string2.clear()
     string2.append(pos=pivot2.pos)
     string2.append(pos=bottom2)
+    
+    if labels:
+        mass1label.pos = mass1.pos
+        mass2label.pos = mass2.pos
 
 reset(None)
 
@@ -239,15 +282,15 @@ while True:
         pradiusslider.value = 0.5
         updatepradius(pradiusslider)
 
+    if mpivot > 0:
+        I = (1/2) * mpivot * (rpivot ** 2)
+        
+
     for e in range(speed_multiplier):
         
         if mpivot > 0:
-            partThatMatters = mpivot
-            denominator = m1 + m2 + partThatMatters
-            
-            rdd = (m1 * l1 * (omega ** 2) + m1 * g * cos(theta) - m2 * g) / denominator
-            thetadd = (-g * sin(theta) - 2 * rd * omega) / l1
-            
+            rdd = (m1 * l1 * omega + g * (m1 * cos(theta) - m2))/(m1 + m2 + (( 2 * I) / (rpivot ** 2)))
+            thetadd = (-g * sin(theta) -2 * rd * omega)/ l1
         else:
             rdd = (m1 * l1 * (omega ** 2) + m1 * g * cos(theta) - m2 * g) / (m1 + m2)
             thetadd = (-g * sin(theta) - 2 * rd * omega) / l1
@@ -266,4 +309,6 @@ while True:
             l1 = L - 0.1
             rd = 0
 
+    gPhase.plot(theta, omega)
+    rPhase.plot(l1, rd)
     update_visuals()
