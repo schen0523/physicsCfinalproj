@@ -8,7 +8,7 @@ scene.caption = """
 <b style="font-size:24px;">Swinging Atwood Machine (SAM)</b><br>
 <b style="font-size:20px;">Serena Chen, Kyle Liu</b><br>
 <b style="font-size:18px;">Introduction</b><br>
-Our project is a simulation of the Swinging Atwood machine (SAM). The setup consists of two masses that are connected by a string that sits on two pivots. 
+Our project is a simulation of the Swinging Atwood Machine (SAM). The setup consists of two masses that are connected by a string that sits on two pivots. 
 In our simulation, we will assume that there is no air resistance, no friction, and a massless string.
 The user will be able to control different aspects of the simulation and see how each one affects the orbit of the swinging mass. 
 This simulation will be able to reproduce the non-linear oscillations and chaotic dynamics created by this system. 
@@ -16,8 +16,13 @@ This simulation will be able to reproduce the non-linear oscillations and chaoti
 <b style="font-size:18px;">UI & Instructions</b><br>
 Our user interface will consist of buttons and sliders. 
 The user will not be able to adjust the sliders while the simulation is running. 
-There are also three different preset conditions that produce rather satisfying/cool(?) oscillations.
-The user can also see how 100 trials that have slightly different conditions will look like after a long period of time. 
+The reset button resets the simulation to the conditions the user had set before pressing the start button. 
+The multi-mode button runs 25 swinging atwood machines at the same time. Each one varies slightly by the last slider that the user changed.
+If the user did not change any sliders, it defaults to small variations in the angle. 
+For example, if the last slider the user adjusted is the mass of the swinging ball, the 25 different balls will all have slightly different masses.
+The user will be able to observe how these conditions affect the swinging mass overtime as this system is extremely sensitive to its initial conditions. 
+There are also three different preset conditions that produce satisfying oscillations.
+Note that trails may become blocky if the ball moves too fast when sped up. Additionally, the simulation may lag or slow down in multi-mode. 
 
 <b style="font-size:18px;">Derivation of Equations of Motion</b><br>
 There will be two parts to the derivation: one with massless pivots and the other with large pulleys. 
